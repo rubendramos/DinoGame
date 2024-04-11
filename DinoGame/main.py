@@ -67,7 +67,7 @@ dino.set_pos_x(dino_x)
 dino.set_pos_y(dino_y)
 
 #Inicializa pterodaptilo
-pterodaptiloHi = Pterodaptilo(-2, terodaptiloImageUp, terodaptiloImageDown, 800, 320)
+pterodaptiloHi = Pterodaptilo(-2, terodaptiloImageUp, terodaptiloImageDown, 800, 270)
 #pterodaptiloLow = Pterodaptilo(-2, terodaptiloImageUp, terodaptiloImageDown, 800, 286)
 #pterodaptiloMid = Pterodaptilo(-2, terodaptiloImageUp, terodaptiloImageDown, 800, 250)
 
@@ -116,6 +116,14 @@ def mostrar_puntuacion(score, hi_score, x, y):
     texto_score = score_font.render(f"HI: {format_hi_score} - SCORE: {format_score}", True, (120, 120, 120))
     pantalla.blit(texto_score, (x, y))
 
+
+def pinta_obstaculo(pos_y):
+    return initialGroundList.append(
+        Picture(random.choice(obstacles), initialGroundList[-1].pos_x + initialGroundList[-1].image.width, pos_y,
+                pantalla, True))
+
+def pinta_pterodaptilo():
+    return Pterodaptilo(-2, Picture(terodaptiloUp, 0, 0, pantalla, True), Picture(terodaptiloDown, 0, 0, pantalla, True), 800, 270)
 # funcion pinta paisaje
 def pinta_paisaje(dino):
     colision = False
@@ -126,13 +134,15 @@ def pinta_paisaje(dino):
             initialGroundList.remove(ground)
             initialGroundList.append(Picture(random.choice(groundList), initialGroundList[-1].pos_x + initialGroundList[-1].image.width, pos_y, pantalla, False))
             initialGroundList.append(Picture(random.choice(groundList), initialGroundList[-1].pos_x + initialGroundList[-1].image.width, pos_y, pantalla, False))
-            initialGroundList.append(Picture(random.choice(obstacles), initialGroundList[-1].pos_x + initialGroundList[-1].image.width, pos_y, pantalla, True))
+            pinta_obstaculo(pos_y)
         ground.set_position_and_paint(ground.get_pos_x() + dino.get_speed(), pos_y)
         if(ground.es_obstaculo() and hai_colisionRectangulos(ground, dino)):
             colision = True
-    pterodaptiloHi.set_velocidad(dino.get_speed())
-    pterodaptiloHi.pinta_pterodaptilo()
-    if (pterodaptiloHi.es_obstaculo() and hai_colisionRectangulos(pterodaptiloHi, dino)):
+
+    pterodaptilo = pinta_pterodaptilo()
+    pterodaptilo.set_velocidad(dino.get_speed())
+    pterodaptilo.pinta_pterodaptilo()
+    if (pterodaptilo.es_obstaculo() and hai_colisionRectangulos(pterodaptilo, dino)):
         colision = True
     cloudHi.pinta_cloud()
     cloudLow.pinta_cloud()
@@ -156,8 +166,8 @@ def hai_colisionRectangulos(picture1, dino1):
     tolerance = 20
     p1_x = picture1.pos_x
     p1_y = picture1.pos_y
-    p1_h = picture1.image.height
-    p1_w = picture1.image.width
+    p1_h = picture1.get_image().height
+    p1_w = picture1.get_image().width
 
     d_x = dino1.pos_x
     d_y = dino1.pos_y

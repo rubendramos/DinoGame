@@ -50,10 +50,10 @@ class Pterodaptilo(Picture):
 
     def pinta_pterodaptilo(self):
         if self.retarder(50):
-            self.set_image(self.imgUp)
-            self.set_position_and_paint(self.pos_x + self.velocidad_x, self.pos_y)
-            #self.imgDown.pos_x = self.imgUp.pos_x + self.velocidad_x
-            #self.pos_x = self.imgUp.pos_x + self.velocidad_x
+            self.set_image(self.imgUp.image)
+            self.imgUp.set_position_and_paint(self.imgUp.pos_x + self.velocidad_x, self.imgUp.pos_y)
+            self.imgDown.pos_x = self.imgUp.pos_x + self.velocidad_x
+            self.pos_x = self.imgUp.pos_x + self.velocidad_x
             print("Uimgup_pos_x", self.imgUp.pos_x)
             print("Uimgup_pos_y", self.imgUp.pos_y)
             print("UimDown_pos_x", self.imgUp.pos_x)
@@ -62,10 +62,10 @@ class Pterodaptilo(Picture):
             print("Upos_y", self.pos_y)
 
         else:
-            self.set_image(self.imgDown)
-            self.set_position_and_paint(self.pos_x + self.velocidad_x, self.pos_y)
-            #self.imgUp.pos_x = self.imgDown.pos_x + self.velocidad_x
-            #self.pos_x = self.imgUp.pos_x + self.velocidad_x
+            self.set_image(self.imgDown.image)
+            self.imgDown.set_position_and_paint(self.imgDown.pos_x + self.velocidad_x, self.imgDown.pos_y)
+            self.imgUp.pos_x = self.imgDown.pos_x + self.velocidad_x
+            self.pos_x = self.imgUp.pos_x + self.velocidad_x
             print("Dimgup_pos_x", self.imgDown.pos_x)
             print("Dimgup_pos_y", self.imgDown.pos_y)
             print("DimDown_pos_x", self.imgDown.pos_x)
