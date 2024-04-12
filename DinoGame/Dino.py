@@ -57,9 +57,9 @@ class Dino(Picture):
     def jump(self, gravity):
         if self.get_estate() == EstateEnum.JUMP:
             self.pos_y -= self.VELOCIDADY * math.sin(math.radians(self.jump_angle))
-            print("posy:", self.pos_y)
-            print("velocidad_y:", Dino.VELOCIDADY)
-            print("gravity:", gravity)
+            #   print("posy:", self.pos_y)
+            #print("velocidad_y:", Dino.VELOCIDADY)
+            #print("gravity:", gravity)
             Dino.VELOCIDADY -= gravity
             if self.VELOCIDADY < -self.JUMP_HEIGHT:
                 self.set_estate(EstateEnum.RUN)

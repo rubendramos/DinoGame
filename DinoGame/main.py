@@ -12,7 +12,15 @@ from Cloud import Cloud as Cloud
 pygame.init()
 pantalla = pygame.display.set_mode((800, 600))
 clock = pygame.time.Clock()
-colision  = False
+PTERODAPTILO_LAUNCH =9000
+OBSTACLE_LAUNCH =1000
+# create a bunch of events
+pterodaptilo_lauch_event = pygame.USEREVENT + 1
+obstacle_lauch_event = pygame.USEREVENT + 2
+
+colision = False
+colisionCaputs = False
+colisionPterodaptilo = False
 
 # Titulo e Icono
 pygame.display.set_caption("Dino Game")
@@ -41,6 +49,9 @@ bigCaptus = Image("bigCaptus", pygame.image.load("images/big_captus.png"), 48, 2
 multipeCaptus = Image("multipeCaptus", pygame.image.load("images/multiple_captus.png"), 48, 73)
 terodaptiloUp = Image("terodaptilo", pygame.image.load("images/terodaptiloUp.png"), 30, 44)
 terodaptiloDown = Image("terodaptilo", pygame.image.load("images/terodaptiloDown.png"), 30, 44)
+# set timer for the dino events
+pygame.time.set_timer(pterodaptilo_lauch_event, PTERODAPTILO_LAUNCH)
+pygame.time.set_timer(obstacle_lauch_event, OBSTACLE_LAUNCH)
 
 #Game over
 game_over = Image("gameover", pygame.image.load("images/gameover.png"), 65, 191)
@@ -65,11 +76,6 @@ dino = Dino(EstateEnum.RUN, dinoImageJump, dinoImageLeft, dinoImageRight, dinoIm
 dino.image = dinoImageLeft
 dino.set_pos_x(dino_x)
 dino.set_pos_y(dino_y)
-
-#Inicializa pterodaptilo
-pterodaptiloHi = Pterodaptilo(-2, terodaptiloImageUp, terodaptiloImageDown, 800, 270)
-#pterodaptiloLow = Pterodaptilo(-2, terodaptiloImageUp, terodaptiloImageDown, 800, 286)
-#pterodaptiloMid = Pterodaptilo(-2, terodaptiloImageUp, terodaptiloImageDown, 800, 250)
 
 #Inicializa cloud
 cloudPicture = Picture(cloud, 0, 0, pantalla, False)
@@ -99,6 +105,7 @@ def inicializa_dinogame():
     ground10 = Picture(img_ground1, 0, 0, pantalla, False)
     ground11 = Picture(img_ground2, 0, 0, pantalla, False)
 
+    initialPterodaptloList = []
 
     initialGroundList = [ground1, ground2, ground3, ground4, ground5, ground6, ground7, ground8, ground9,
                          ground10, ground11]
@@ -106,7 +113,7 @@ def inicializa_dinogame():
         ground.set_pos_x(pos_x_inicial)
         pos_x_inicial = pos_x_inicial + ground.image.width
 
-    return initialGroundList
+    return initialGroundList, initialPterodaptloList
 
 
 # funcion mostrar puntaje
@@ -118,37 +125,50 @@ def mostrar_puntuacion(score, hi_score, x, y):
 
 
 def pinta_obstaculo(pos_y):
-    return initialGroundList.append(
+    initialGroundList.append(
         Picture(random.choice(obstacles), initialGroundList[-1].pos_x + initialGroundList[-1].image.width, pos_y,
                 pantalla, True))
 
-def pinta_pterodaptilo():
-    return Pterodaptilo(-2, Picture(terodaptiloUp, 0, 0, pantalla, True), Picture(terodaptiloDown, 0, 0, pantalla, True), 800, 270)
-# funcion pinta paisaje
-def pinta_paisaje(dino):
-    colision = False
+def engade_pterodaptilo():
+        initialPterodaptloList.append(Pterodaptilo(-2, Picture(terodaptiloUp, 0, 0, pantalla, True), Picture(terodaptiloDown, 0, 0, pantalla, True), 800,
+                 random.choice(pterodaptiloHiList)))
 
+def pinta_suelo(dino):
+
+    colision = False
     for ground in initialGroundList:
         pos_y = dino_y + dinoImageLeft.image.height - ground.image.height
         if ground.pos_x <= -100:
             initialGroundList.remove(ground)
             initialGroundList.append(Picture(random.choice(groundList), initialGroundList[-1].pos_x + initialGroundList[-1].image.width, pos_y, pantalla, False))
             initialGroundList.append(Picture(random.choice(groundList), initialGroundList[-1].pos_x + initialGroundList[-1].image.width, pos_y, pantalla, False))
-            pinta_obstaculo(pos_y)
         ground.set_position_and_paint(ground.get_pos_x() + dino.get_speed(), pos_y)
         if(ground.es_obstaculo() and hai_colisionRectangulos(ground, dino)):
             colision = True
+    return colision
 
-    pterodaptilo = pinta_pterodaptilo()
-    pterodaptilo.set_velocidad(dino.get_speed())
-    pterodaptilo.pinta_pterodaptilo()
-    if (pterodaptilo.es_obstaculo() and hai_colisionRectangulos(pterodaptilo, dino)):
-        colision = True
-    cloudHi.pinta_cloud()
+def pinta_pterodaptilos(dino):
+    colision = False
+    for pterodaptilo in initialPterodaptloList:
+        if pterodaptilo.pos_x <= -100:
+            initialPterodaptloList.remove(pterodaptilo)
+        pterodaptilo.set_velocidad(dino.get_speed())
+        pterodaptilo.pinta_pterodaptilo()
+        if (pterodaptilo.es_obstaculo() and hai_colisionRectangulos(pterodaptilo, dino)):
+            colision = True
+    return colision
+
+def pinta_nuves() -> object:
     cloudLow.pinta_cloud()
     cloudMid.pinta_cloud()
+
+# funcion pinta paisaje
+def pinta_paisaje(dino):
     dino.pinta_dino(gravedad)
-    return colision
+    colisionCaputs = pinta_suelo(dino)
+    colisionPterodaptilo = pinta_pterodaptilos(dino)
+    pinta_nuves()
+    return colisionCaputs or colisionPterodaptilo
 
 
 # Dectecta colisión
@@ -186,25 +206,26 @@ def hai_colisionRectangulos(picture1, dino1):
         return False
     else:
 
-        print("p1x", p1_x, ">=", d_x + d_w - tolerance)
-        print("p1y", p1_y, ">=", d_y + d_h - tolerance)
-        print("p1h", p1_h)
-        print("p1w", p1_w)
+  #      print("p1x", p1_x, ">=", d_x + d_w - tolerance)
+  #        print("p1y", p1_y, ">=", d_y + d_h - tolerance)
+  #      print("p1h", p1_h)
+  #      print("p1w", p1_w)
 
-        print("d1x", d_x, ">=", p1_x + p1_w - tolerance,)
-        print("d1y", d_y, ">=", p1_y + p1_h - tolerance )
-        print("d1h", d_h)
-        print("d1w", d_w)
+  #     print("d1x", d_x, ">=", p1_x + p1_w - tolerance,)
+  #      print("d1y", d_y, ">=", p1_y + p1_h - tolerance )
+  #      print("d1h", d_h)
+  #     print("d1w", d_w)
 
         print("Colision!!!!!")
         return True
 
 en_ejecucion = True
 
-initialGroundList = inicializa_dinogame()
+initialGroundList, initialPterodaptloList = inicializa_dinogame()
 groundList = [img_ground1, img_ground2, img_ground3]
 obstacles = [captus3, captus1, bigCaptus, multipeCaptus]
 clouds = [cloudLow,cloudHi,cloudMid]
+pterodaptiloHiList = [295,290,280]
 
 #animals = [pterodaptiloHi, pterodaptiloMid, pterodaptiloLow]
 
@@ -235,8 +256,10 @@ while en_ejecucion:
                 start_ticks = pygame.time.get_ticks()
                 speed = -5
                 score = 0
-                initialGroundList = inicializa_dinogame()
+                initialGroundList, initialPterodaptloList = inicializa_dinogame()
                 colision = False
+                colisionCaputs = False
+                colisionPterodaptilo = False
 
                 pygame.display.update()
         if evento.type == pygame.KEYUP:
@@ -246,13 +269,19 @@ while en_ejecucion:
                     dino.reset_jump_speed()
                     dino.set_estate(EstateEnum.RUN)
                 print("tecla down up")
+        if evento.type == pterodaptilo_lauch_event:
+            engade_pterodaptilo()
+            pygame.time.set_timer(pterodaptilo_lauch_event, random.randint(10000, 15000))
+        if evento.type == obstacle_lauch_event:
+            pos_y = dino.dino_y + dinoImageLeft.image.height - initialGroundList[1].image.height
+            pinta_obstaculo(pos_y)
 
     pantalla.fill(fondo)
     mostrar_puntuacion(score, hi_score, score_x, score_y)
     if colision == False:
         colision = pinta_paisaje(dino)
         pygame.display.update()
-        dino.set_speed(dino.get_speed() - 0.0001)
+        dino.set_speed(dino.get_speed() - 0.001)
     else:
         dino.set_speed(0)
         dino.set_estate(EstateEnum.DEAD)

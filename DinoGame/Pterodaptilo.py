@@ -22,12 +22,12 @@ class Pterodaptilo(Picture):
         self.set_image(self.imgUp.image)
         self.height = self.imgUp.image.height
         self.width = self.imgUp.image.width
-        print("Ini pos_x", self.pos_x)
-        print("Ini pos_y", self.pos_x)
-        print("Ini imgup_pos_x", self.imgUp.pos_x)
-        print("Ini imgup_pos_y", self.imgUp.pos_x)
-        print("Ini imgdow_pos_x", self.imgDown.pos_x)
-        print("Ini imgdow_pos_y", self.imgDown.pos_x)
+        #    print("Ini pos_x", self.pos_x)
+        #  print("Ini pos_y", self.pos_x)
+        #   print("Ini imgup_pos_x", self.imgUp.pos_x)
+        #   print("Ini imgup_pos_y", self.imgUp.pos_x)
+        #   print("Ini imgdow_pos_x", self.imgDown.pos_x)
+        #   print("Ini imgdow_pos_y", self.imgDown.pos_x)
 
     def set_image(self, image):
         self.image = image
@@ -54,21 +54,21 @@ class Pterodaptilo(Picture):
             self.imgUp.set_position_and_paint(self.imgUp.pos_x + self.velocidad_x, self.imgUp.pos_y)
             self.imgDown.pos_x = self.imgUp.pos_x + self.velocidad_x
             self.pos_x = self.imgUp.pos_x + self.velocidad_x
-            print("Uimgup_pos_x", self.imgUp.pos_x)
-            print("Uimgup_pos_y", self.imgUp.pos_y)
-            print("UimDown_pos_x", self.imgUp.pos_x)
-            print("UimDown_pos_y", self.imgUp.pos_y)
-            print("Upos_x", self.pos_x)
-            print("Upos_y", self.pos_y)
+            #   print("Uimgup_pos_x", self.imgUp.pos_x)
+            #   print("Uimgup_pos_y", self.imgUp.pos_y)
+            #   print("UimDown_pos_x", self.imgUp.pos_x)
+            #    print("UimDown_pos_y", self.imgUp.pos_y)
+            #    print("Upos_x", self.pos_x)
+            #   print("Upos_y", self.pos_y)
 
         else:
             self.set_image(self.imgDown.image)
             self.imgDown.set_position_and_paint(self.imgDown.pos_x + self.velocidad_x, self.imgDown.pos_y)
             self.imgUp.pos_x = self.imgDown.pos_x + self.velocidad_x
             self.pos_x = self.imgUp.pos_x + self.velocidad_x
-            print("Dimgup_pos_x", self.imgDown.pos_x)
-            print("Dimgup_pos_y", self.imgDown.pos_y)
-            print("DimDown_pos_x", self.imgDown.pos_x)
-            print("DimDown_pos_y", self.imgDown.pos_y)
-            print("Dpos_x", self.pos_x)
-            print("Dpos_y", self.pos_y)
+            #  print("Dimgup_pos_x", self.imgDown.pos_x)
+            #   print("Dimgup_pos_y", self.imgDown.pos_y)
+            #   print("DimDown_pos_x", self.imgDown.pos_x)
+            #  print("DimDown_pos_y", self.imgDown.pos_y)
+            #   print("Dpos_x", self.pos_x)
+            #   print("Dpos_y", self.pos_y)
