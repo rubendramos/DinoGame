@@ -13,10 +13,12 @@ pygame.init()
 pantalla = pygame.display.set_mode((800, 600))
 clock = pygame.time.Clock()
 PTERODAPTILO_LAUNCH =9000
-OBSTACLE_LAUNCH =1000
+OBSTACLE_LAUNCH =900
+CLOUD_LAUNCH =9000
 # create a bunch of events
 pterodaptilo_lauch_event = pygame.USEREVENT + 1
 obstacle_lauch_event = pygame.USEREVENT + 2
+cloud_lauch_event = pygame.USEREVENT + 3
 
 colision = False
 colisionCaputs = False
@@ -52,6 +54,7 @@ terodaptiloDown = Image("terodaptilo", pygame.image.load("images/terodaptiloDown
 # set timer for the dino events
 pygame.time.set_timer(pterodaptilo_lauch_event, PTERODAPTILO_LAUNCH)
 pygame.time.set_timer(obstacle_lauch_event, OBSTACLE_LAUNCH)
+pygame.time.set_timer(cloud_lauch_event, CLOUD_LAUNCH)
 
 #Game over
 game_over = Image("gameover", pygame.image.load("images/gameover.png"), 65, 191)
@@ -78,10 +81,10 @@ dino.set_pos_x(dino_x)
 dino.set_pos_y(dino_y)
 
 #Inicializa cloud
-cloudPicture = Picture(cloud, 0, 0, pantalla, False)
-cloudHi = Cloud(-.1, cloudPicture, 800, 250)
-cloudMid = Cloud(-.2, cloudPicture, 800, 225)
-cloudLow = Cloud(-.3, cloudPicture, 800, 200)
+#cloudPicture = Picture(cloud, 0, 0, pantalla, False)
+#cloudHi = Cloud(-.1, cloudPicture, 800, 250)
+#cloudMid = Cloud(-.2, cloudPicture, 800, 225)
+#cloudLow = Cloud(-.3, cloudPicture, 800, 200)
 
 # puntaje
 hi_score = 0
@@ -90,9 +93,15 @@ score_font = pygame.font.Font('TerminalVector.ttf', 15)
 score_x = 550
 score_y = 10
 
+
+#Sounds a music
+pygame.mixer.music.load('sounds/dino2.wav')
+
+
 ##Inicializamos dinon game
 def inicializa_dinogame():
     pos_x_inicial = 0
+    pygame.mixer.music.play(-1)
     ground1 = Picture(img_ground1, 0, 0, pantalla, False)
     ground2 = Picture(img_ground2, 0, 0, pantalla, False)
     ground3 = Picture(img_ground3, 0, 0, pantalla, False)
@@ -107,13 +116,15 @@ def inicializa_dinogame():
 
     initialPterodaptloList = []
 
+    initialCloudList = []
+
     initialGroundList = [ground1, ground2, ground3, ground4, ground5, ground6, ground7, ground8, ground9,
                          ground10, ground11]
     for ground in initialGroundList:
         ground.set_pos_x(pos_x_inicial)
         pos_x_inicial = pos_x_inicial + ground.image.width
 
-    return initialGroundList, initialPterodaptloList
+    return initialGroundList, initialPterodaptloList, initialCloudList
 
 
 # funcion mostrar puntaje
@@ -132,6 +143,11 @@ def pinta_obstaculo(pos_y):
 def engade_pterodaptilo():
         initialPterodaptloList.append(Pterodaptilo(-2, Picture(terodaptiloUp, 0, 0, pantalla, True), Picture(terodaptiloDown, 0, 0, pantalla, True), 800,
                  random.choice(pterodaptiloHiList)))
+
+
+def engade_cloud():
+    initialCloudList.append(Cloud(random.choice(cloudSpeedList), Picture(cloud, 0, 0, pantalla, False), 800, random.choice(cloudHiList)))
+
 
 def pinta_suelo(dino):
 
@@ -159,8 +175,11 @@ def pinta_pterodaptilos(dino):
     return colision
 
 def pinta_nuves() -> object:
-    cloudLow.pinta_cloud()
-    cloudMid.pinta_cloud()
+    for cloud in initialCloudList:
+        if cloud.pos_x <= -100:
+            initialCloudList.remove(cloud)
+        cloud.pinta_cloud()
+
 
 # funcion pinta paisaje
 def pinta_paisaje(dino):
@@ -221,11 +240,13 @@ def hai_colisionRectangulos(picture1, dino1):
 
 en_ejecucion = True
 
-initialGroundList, initialPterodaptloList = inicializa_dinogame()
+initialGroundList, initialPterodaptloList, initialCloudList = inicializa_dinogame()
 groundList = [img_ground1, img_ground2, img_ground3]
 obstacles = [captus3, captus1, bigCaptus, multipeCaptus]
-clouds = [cloudLow,cloudHi,cloudMid]
+#clouds = [cloudLow,cloudHi,cloudMid]
 pterodaptiloHiList = [295,290,280]
+cloudHiList = [200,250,100,150,125,225]
+cloudSpeedList = [-.1, -.2, -.3]
 
 #animals = [pterodaptiloHi, pterodaptiloMid, pterodaptiloLow]
 
@@ -256,7 +277,7 @@ while en_ejecucion:
                 start_ticks = pygame.time.get_ticks()
                 speed = -5
                 score = 0
-                initialGroundList, initialPterodaptloList = inicializa_dinogame()
+                initialGroundList, initialPterodaptloList, initialCloudList = inicializa_dinogame()
                 colision = False
                 colisionCaputs = False
                 colisionPterodaptilo = False
@@ -275,6 +296,8 @@ while en_ejecucion:
         if evento.type == obstacle_lauch_event:
             pos_y = dino.dino_y + dinoImageLeft.image.height - initialGroundList[1].image.height
             pinta_obstaculo(pos_y)
+        if evento.type == cloud_lauch_event:
+            engade_cloud()
 
     pantalla.fill(fondo)
     mostrar_puntuacion(score, hi_score, score_x, score_y)
