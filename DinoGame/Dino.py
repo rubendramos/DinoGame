@@ -5,12 +5,9 @@ import math
 
 class Dino(Picture):
     estate = 0
-    DINO_INI_SPEED = -3
-    Y_GRAVITY = 1
     JUMP_HEIGHT = 20
-    velocidad_x = DINO_INI_SPEED
     jump_angle = 30
-    VELOCIDADY = 20
+    JUMP_SPEED = 20
     DINO_X = 124
     DINO_Y = 300
     dino_x = 124
@@ -31,7 +28,7 @@ class Dino(Picture):
         self.set_image(imgRunL)
         self.dino_y_bend = self.dino_y+(self.imgRunR.image.height-self.imgBendR.image.height)
         self.dino_x_bend = self.dino_x - (self.imgRunR.image.width - self.imgBendR.image.width)
-        self.speed = Dino.DINO_INI_SPEED
+        self.speed = 0
 
     def get_estate(self):
         return self.estate
@@ -43,7 +40,7 @@ class Dino(Picture):
         return self.estate
 
     def reset_jump_speed(self):
-        Dino.VELOCIDADY = Dino.JUMP_HEIGHT
+        Dino.JUMP_SPEED = Dino.JUMP_HEIGHT
 
     def set_image(self, image):
         self.image = image
@@ -56,14 +53,11 @@ class Dino(Picture):
 
     def jump(self, gravity):
         if self.get_estate() == EstateEnum.JUMP:
-            self.pos_y -= self.VELOCIDADY * math.sin(math.radians(self.jump_angle))
-            #   print("posy:", self.pos_y)
-            #print("velocidad_y:", Dino.VELOCIDADY)
-            #print("gravity:", gravity)
-            Dino.VELOCIDADY -= gravity
-            if self.VELOCIDADY < -self.JUMP_HEIGHT:
+            self.pos_y -= self.JUMP_SPEED * math.sin(math.radians(self.jump_angle))
+            Dino.JUMP_SPEED -= gravity
+            if self.JUMP_SPEED < -self.JUMP_HEIGHT:
                 self.set_estate(EstateEnum.RUN)
-                Dino.VELOCIDADY = Dino.JUMP_HEIGHT
+                Dino.JUMP_SPEED = Dino.JUMP_HEIGHT
 
     #Realiza un retardo de retardo ciclos de reloj
     def retarder(self, retardo):
@@ -103,11 +97,11 @@ class Dino(Picture):
         elif self.get_estate() == EstateEnum.DEAD:
             self.imgDead.set_position_and_paint(self.get_pos_x(), self.dino_y)
 
-    def reset(self):
+    def reset(self, speed):
         self.set_pos_x(self.DINO_X)
         self.set_pos_y(self.DINO_Y)
-        self.velocidad_x = Dino.DINO_INI_SPEED
+        self.set_speed(speed)
+        self.velocidad_x = self.get_speed()
         self.set_estate(EstateEnum.RUN)
         self.set_image(self.imgRunL)
-        self.set_speed(Dino.DINO_INI_SPEED)
-        Dino.VELOCIDADY = Dino.JUMP_HEIGHT
+        Dino.JUMP_SPEED = Dino.JUMP_HEIGHT
